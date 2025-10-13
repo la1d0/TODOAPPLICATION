@@ -1,0 +1,51 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+    <link type="text/css" href="{% static 'todo/css/styles.css' %}" rel="stylesheet" />
+</head>
+<body>
+    <!-- Навигация -->
+    <nav class="navbar">
+        <ul class="main-menu">
+            {% for m in mainmenu %}
+            <li><a href="{% url m.url_name %}">{{ m.title }}</a></li>
+            {% endfor %}
+        </ul>
+    </nav>
+
+    <!-- Пользователь -->
+    <div class="user-info">
+        {% if user.is_authenticated %}
+            <span><strong><a href="{% url 'users:profile' %}">{{ user.username }}</a></strong></span>
+            <form action="{% url 'users:logout' %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn-danger">Выйти</button>
+            </form>
+        {% else %}
+            <a href="{% url 'users:login' %}" class="btn">Войти</a>
+            <a href="{% url 'users:register' %}" class="btn btn-success">Регистрация</a>
+        {% endif %}
+    </div>
+
+    <!-- Основной контент -->
+    <main>
+        {% block content %}
+        {% endblock %}
+
+        {% block navigation %}
+        {% endblock %}
+    </main>
+</body>
+<footer class="footer">
+    <div class="footer-content">
+        <p>&copy; 2025 Todo Application. Все права не защищены.</p>
+        <div class="footer-links">
+            <a href="{% url 'about' %}">О сайте</a>
+            <a href="{% url 'contact' %}">Обратная связь</a>
+        </div>
+    </div>
+</footer>
+</html>

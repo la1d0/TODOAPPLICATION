@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="text-center">
+    <h1>{{ title }}</h1>
+    <a href="{% url 'addpage' %}" class="btn btn-success">➕ Новая задача</a>
+</div>
+
+<ul class="list-tasks">
+    {% for t in tasks %}
+    <li class="task-item">
+        <h2>{{ t.title }}</h2>
+        <p>{{ t.content }}</p>
+
+        <div class="task-meta">
+            <small>Создано: {{ t.time_created|date:"d.m.Y H:i" }}</small>
+            <br>
+            <strong>Статус:
+                {% if t.status %}
+                    <span style="color: #27ae60;">✅ Выполнено</span>
+                {% else %}
+                    <span style="color: #e67e22;">⏳ В процессе</span>
+                {% endif %}
+            </strong>
+        </div>
+
+        <div class="task-actions">
+            <!-- Кнопка статуса -->
+            <form method="post" action="{% url 'toogletask' t.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="btn">
+                    {% if t.status %}
+                        ↩️ Вернуть в работу
+                    {% else %}
+                        ✅ Выполнить
+                    {% endif %}
+                </button>
+            </form>
+
+            <!-- Кнопка удаления -->
+            <form method="post" action="{% url 'deletetask' t.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="btn-danger" onclick="return confirm('Удалить эту задачу?')">
+                    🗑️ Удалить
+                </button>
+            </form>
+        </div>
+    </li>
+    {% empty %}
+    <li class="task-item text-center">
+        <p>🎉 Пока нет задач! Создайте первую задачу.</p>
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}
+
+{% block navigation %}
+<!-- Пагинация -->
+{% if page_obj.has_other_pages %}
+<nav class="list-pages">
+    <ul>
+        {% if page_obj.has_previous %}
+        <li class="page-num">
+            <a href="?page={{ page_obj.previous_page_number }}" title="Предыдущая страница">&lt;</a>
+        </li>
+        {% endif %}
+
+        {% for p in paginator.page_range %}
+            {% if page_obj.number == p %}
+            <li class="page-num page-num-selected">{{ p }}</li>
+            {% elif p >= page_obj.number|add:-2 and p <= page_obj.number|add:2 %}
+            <li class="page-num">
+                <a href="?page={{ p }}">{{ p }}</a>
+            </li>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+        <li class="page-num">
+            <a href="?page={{ page_obj.next_page_number }}" title="Следующая страница">&gt;</a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+
+<!-- Информация о странице -->
+{% if page_obj %}
+<div class="pagination-info text-center">
+    <small style="color: #6c757d;">
+        Страница {{ page_obj.number }} из {{ paginator.num_pages }}
+        • Всего задач: {{ paginator.count }}
+    </small>
+</div>
+{% endif %}
+
+{% endblock %}
