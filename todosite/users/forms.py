@@ -72,4 +72,3 @@ class UserPasswordChangeForm(PasswordChangeForm):
     new_password2 = forms.CharField(label='Подтверждение пароля',
                                    widget=forms.PasswordInput(attrs={'class': 'form-input'}),
                                    )
-
